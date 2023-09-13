@@ -29,7 +29,7 @@ def send_email(email, password, array):
         smtp.login(email, password)
         smtp.sendmail(email, email, msg.as_string())
         smtp.quit()
-        print('邮件发送成功')
+        print('提交次数发送成功')
     except smtplib.SMTPException as e:
         print('邮件发送失败，错误信息：', e)
 
@@ -181,7 +181,7 @@ def data_collection(email, password, data_face, data_lip, random_num):
         smtp.login(email, password)
         smtp.sendmail(email, email, msg.as_string())
         smtp.quit()
-        print('邮件发送成功')
+        print('数据发送成功')
     except smtplib.SMTPException as e:
         print('邮件发送失败，错误信息：', e)
 
@@ -208,23 +208,25 @@ def page(random_num):
         if st.button("Submit results"):
             st.write('It will take about 10 seconds, please be patient and wait.')
             array = read_email_(myemail, password)
-            print(array)
+            print('第二次：', array)
             array[random_num]+=1
+            print('提交：', array)
             send_email(myemail, password, array)
             data_collection(myemail, password, data_face, data_lip, random_num)
             st.session_state.button_clicked = True 
 
     if st.session_state.button_clicked == True:
         st.success("Successfully submitted the results. Thank you for using it. Now you can exit the system.")
+        st.cache_data.clear()
 
 if __name__ == '__main__':
     dataset = 'BIWI' 
     st.set_page_config(page_title="userstudy")
     myemail = st.secrets["my_email"]["email"]  
     password =  st.secrets["my_email"]["password"]  
-
+    
     array = read_email(myemail, password)
-    print(array)
+    print('第一次：', array)
     if all(element == 3 for element in array):
         array = [0] * 10
 
