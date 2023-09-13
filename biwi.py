@@ -206,6 +206,7 @@ def page(random_num):
 
     if not st.session_state.button_clicked:
         if st.button("Submit results"):
+            st.write('It will take about 10 seconds, please be patient and wait.')
             array = read_email_(myemail, password)
             print(array)
             array[random_num]+=1
