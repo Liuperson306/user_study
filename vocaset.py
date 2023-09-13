@@ -196,7 +196,7 @@ def page(random_num):
         
     for num in range(15):
         # 显示页面内容
-        #st.write(f'这是第{num+1+random_num*15}个视频，名称为{file_list[num+random_num*15].rstrip()}')
+        st.write(f'这是第{num+1+random_num*15}个视频，名称为{file_list[num+random_num*15].rstrip()}')
         st.subheader(fr"Video {num+1}")
         video_bytes = play_video(file_list[num+random_num*15].rstrip())
         st.video(video_bytes)
@@ -206,6 +206,7 @@ def page(random_num):
 
     if not st.session_state.button_clicked:
         if st.button("Submit results"):
+            st.write('It will take about 10 seconds, please be patient and wait.')
             array = read_email_(myemail, password)
             print(array)
             array[random_num]+=1
