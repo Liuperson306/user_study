@@ -222,7 +222,7 @@ def page(random_num):
 if __name__ == '__main__':
     dataset = 'VOCASET' 
     st.set_page_config(page_title="userstudy")
-    st.cache_data.clear() # 初始化
+    #st.cache_data.clear() # 初始化
     myemail = st.secrets["my_email"]["email"]  
     password =  st.secrets["my_email"]["password"]  
     
