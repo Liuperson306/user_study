@@ -210,7 +210,7 @@ def page(random_num):
     if not st.session_state.button_clicked:
         if st.button("Submit results"):
             if any(x == "" for x in data_face or x == "" for x in data_lip):
-                st.warning("Please answer all questions before submitting the results.")
+                st.warning("Please answer all the questions before submitting the results.")
             if not any(x == "" for x in data_face or x == "" for x in data_lip):
                 st.write('It will take about 10 seconds, please be patient and wait.')
                 array = read_email_(myemail, password)
