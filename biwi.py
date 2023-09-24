@@ -116,9 +116,9 @@ def instrunction():
 def QA(data_face, data_lip, num):
     # 定义问题和选项
     question_1 = "Comparing the two full :blue[faces], which one looks more :blue[realistic]?"
-    options_1 = ["Left", "Right"]
+    options_1 = ["", "Left", "Right"]
     question_2 = "Comparing the :blue[lips] of two faces, which one is more :blue[in sync with audio]?"
-    options_2 = ["Left", "Right"]
+    options_2 = ["", "Left", "Right"]
 
     # 显示问题并获取用户的答案
     answer_1 = st.radio(label=question_1, options=options_1, key=fr"button{num}.1")
@@ -138,6 +138,9 @@ def get_ans(answer_str):
         return "1"
     elif "Right" in answer_str:
         return "0"
+    elif "" in answer_str:
+        #return ""
+        return "1"
     
 @st.cache_data
 def play_video(file_name):
@@ -187,7 +190,7 @@ def data_collection(email, password, data_face, data_lip, random_num):
 
 def page(random_num):
     instrunction()
-    file = open(fr"filenames_{dataset}.txt", "r", encoding='utf-8') 
+    file = open(fr"biwi_gt.txt", "r", encoding='utf-8') 
     file_list = file.readlines()
     file.close()
 
@@ -196,7 +199,7 @@ def page(random_num):
         
     for num in range(15):
         # 显示页面内容
-        #st.write(f'这是第{num+1+random_num*15}个视频，名称为{file_list[num+random_num*15].rstrip()}')
+        st.write(f'这是第{num+1+random_num*15}个视频，名称为{file_list[num+random_num*15].rstrip()}')
         st.subheader(fr"Video {num+1}")
         video_bytes = play_video(file_list[num+random_num*15].rstrip())
         st.video(video_bytes)
@@ -206,14 +209,17 @@ def page(random_num):
 
     if not st.session_state.button_clicked:
         if st.button("Submit results"):
-            st.write('It will take about 10 seconds, please be patient and wait.')
-            array = read_email_(myemail, password)
-            print('第二次：', array)
-            array[random_num]+=1
-            print('提交：', array)
-            send_email(myemail, password, array)
-            data_collection(myemail, password, data_face, data_lip, random_num)
-            st.session_state.button_clicked = True 
+            if any(x == "" for x in data_face or x == "" for x in data_lip):
+                st.warning("Please answer all questions before submitting the results.")
+            if not any(x == "" for x in data_face or x == "" for x in data_lip):
+                st.write('It will take about 10 seconds, please be patient and wait.')
+                array = read_email_(myemail, password)
+                print('第二次：', array)
+                array[random_num]+=1
+                print('提交：', array)
+                send_email(myemail, password, array)
+                data_collection(myemail, password, data_face, data_lip, random_num)
+                st.session_state.button_clicked = True 
 
     if st.session_state.button_clicked == True:
         st.cache_data.clear()
@@ -223,14 +229,18 @@ def page(random_num):
 if __name__ == '__main__':
     dataset = 'BIWI' 
     st.set_page_config(page_title="userstudy")
-    #st.cache_data.clear() # 初始化
+    st.cache_data.clear() # 初始化
     myemail = st.secrets["my_email"]["email"]  
-    password =  st.secrets["my_email"]["password"]  
+    password =  st.secrets["my_email"]["password"]
+    random_range = 2  
     
     array = read_email(myemail, password)
     print('第一次：', array)
-    if all(element == 3 for element in array):
-        array = [0] * 10
+    if array == None:
+        st.cache_data.clear()
+
+    if all(element >= 3 for element in array):
+        array = [0] * random_range
 
     if "data_face" and "data_lip" not in st.session_state:
         # 初始化data变量
@@ -242,12 +252,13 @@ if __name__ == '__main__':
     random_num = 0
 
     if 'random_num' not in st.session_state:
-        st.session_state.random_num = random.randint(0, 9)
+        st.session_state.random_num = random.randint(0, random_range-1)
         if array[st.session_state.random_num] == 3 or array[st.session_state.random_num] > 3 :
             while True:
-                st.session_state.random_num = random.randint(0, 9)
+                st.session_state.random_num = random.randint(0, random_range-1)
                 if array[st.session_state.random_num] < 3 :
                     break
 
     random_num = st.session_state.random_num
     page(random_num)
+
